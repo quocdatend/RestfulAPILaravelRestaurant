@@ -6,17 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderItemRequest;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use App\Services\OrderItemService;
 
 use function Laravel\Prompts\confirm;
 
 class OrderItemController extends Controller
 {
+    protected $orderItemService;
+
+    public function __construct(OrderItemService $orderItemService)
+    {
+        $this->orderItemService = $orderItemService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $orderItems = OrderItem::all();
+        $orderItems = $this->orderItemService->getAllOrderItems();
         return response()->json([
             'status' => 'success',
             'order_items' => $orderItems
@@ -62,7 +70,13 @@ class OrderItemController extends Controller
      */
     public function findByOrder($orderId)
     {
-        $orderItems = OrderItem::where('order_id', $orderId)->get();
+        $orderItems = $this->orderItemService->getOrderItemsByOrderId($orderId);
+        if ($orderItems->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No order items found for this order ID'
+            ], 404);
+        }
         return response()->json([
             'status' => 'success',
             'order_items' => $orderItems
@@ -92,8 +106,14 @@ class OrderItemController extends Controller
     {
         $validated = $request->validated();
 
-        $orderItem = OrderItem::findOrFail($id);
-        $orderItem->update([
+        $orderItem = $this->orderItemService->getOrderItemById($id);
+        if (!$orderItem) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order item not found'
+            ], 404);
+        }
+        $this->orderItemService->updateOrderItem($orderItem,[
             'order_id' => $validated['order_id'],
             'menu_id' => $validated['menu_id'],
             'quantity' => $validated['quantity'],
@@ -111,8 +131,17 @@ class OrderItemController extends Controller
      */
     public function updateStatus($id)
     {
-        $orderItem = OrderItem::findOrFail($id);
-        $orderItem->update(['status' => 1]);
+        $orderItem = $this->orderItemService->getOrderItemById($id);
+        if (!$orderItem) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order item not found'
+            ], 404);
+        }
+
+        $this->orderItemService->updateOrderItem($orderItem, [
+            'status' => $orderItem->status == 1
+        ]);
 
         return response()->json([
             'status' => 'success',
@@ -126,8 +155,16 @@ class OrderItemController extends Controller
      */
     public function cancelOrderItem($id)
     {
-        $orderItem = OrderItem::findOrFail($id);
-        $orderItem->update(['status' => -1]);
+        $orderItem = $this->orderItemService->getOrderItemById($id);
+        if (!$orderItem) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order item not found'
+            ], 404);
+        }
+        $this->orderItemService->updateOrderItem($orderItem, [
+            'status' => -1
+        ]);
 
         return response()->json([
             'status' => 'success',
@@ -141,8 +178,14 @@ class OrderItemController extends Controller
      */
     public function destroy($id)
     {
-        $orderItem = OrderItem::findOrFail($id);
-        $orderItem->delete();
+        $orderItem = $this->orderItemService->getOrderItemById($id);
+        if (!$orderItem) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order item not found'
+            ], 404);
+        }
+        $this->orderItemService->deleteOrderItem($orderItem);
 
         return response()->json([
             'status' => 'success',

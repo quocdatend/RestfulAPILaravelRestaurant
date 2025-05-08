@@ -6,15 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\Reviews;
 use Illuminate\Http\Request;
 use App\Http\Requests\ReviewRequest;
+use App\Services\ReviewService;
 
 class ReviewController extends Controller
 {
+    protected $reviewService;
+
+    public function __construct(ReviewService $reviewService)
+    {
+        $this->reviewService = $reviewService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $reviews = Reviews::all();
+        $reviews = $this->reviewService->getAllReviews();
         return response()->json([
             'status' => 'success',
             'reviews' => $reviews
@@ -28,7 +36,7 @@ class ReviewController extends Controller
     {
         $validated = $request->validated();
 
-        $review = Reviews::create([
+        $review = $this->reviewService->createReview([
             'id' => uniqid(),
             'user_id' => $request->user()->id,
             'rating' => $validated['rating'],

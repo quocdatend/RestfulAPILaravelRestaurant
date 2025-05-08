@@ -6,15 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use App\Http\Requests\MenuRequest;
+use App\Services\MenuService;
 
 class MenuController extends Controller
 {
+    protected $menuService;
+
+    public function __construct(MenuService $menuService)
+    {
+        $this->menuService = $menuService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $menus = Menu::all();
+        $menus = $this->menuService->getAllMenus();
         return response()->json([
             'status' => 'success',
             'menus' => $menus
@@ -34,7 +42,7 @@ class MenuController extends Controller
             $imagePath = $request->file('image')->store('images', 'public');
         }
 
-        $menu = Menu::create([
+        $menu = $this->menuService->create([
             'id' => uniqid(),
             'name' => $validated['name'],
             'price' => $validated['price'],
@@ -81,7 +89,7 @@ class MenuController extends Controller
      */
     public function findByCategory($category)
     {
-        $menus = Menu::where('category_id', $category)->get();
+        $menus = $this->menuService->getMenuByCategoryId($category);
 
         return response()->json([
             'status' => 'success',
@@ -96,7 +104,14 @@ class MenuController extends Controller
     {
         $validated = $request->validated();
 
-        $menu = Menu::findOrFail($id);
+        $menu = $this->menuService->getMenuById($id);
+
+        if (!$menu) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Menu not found'
+            ], 404);
+        }
 
         $menu->name = $validated['name'];
         $menu->price = $validated['price'];
@@ -118,10 +133,18 @@ class MenuController extends Controller
      */
     public function destroy($id)
     {
-        $menu = Menu::findOrFail($id);
+        $menu = $this->menuService->getMenuById($id);
 
-        $menu->status = 0;
-        $menu->save();
+        if (!$menu) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Menu not found'
+            ], 404);
+        }
+
+        $this->menuService->update($menu, [
+            'status' => 0
+        ]);
 
         return response()->json([
             'status' => 'success',

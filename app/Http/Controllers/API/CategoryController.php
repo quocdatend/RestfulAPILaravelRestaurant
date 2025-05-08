@@ -6,15 +6,31 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Services\CategoryService;
 
 class CategoryController extends Controller
 {
+    /**
+     * @var CategoryService
+     */
+    protected $categoryService;
+
+    /**
+     * CategoryController constructor.
+     *
+     * @param CategoryService $categoryService
+     */
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $categories = Category::all();
+        $categories = $this->categoryService->getAllCategories();
         return response()->json([
             'status' => 'success',
             'categories' => $categories
@@ -28,7 +44,7 @@ class CategoryController extends Controller
     {
         $validated = $request->validated();
 
-        $category = Category::create([
+        $category = $this->categoryService->create([
             'id' => uniqid(),
             'name' => $validated['name'],
         ]);
@@ -64,10 +80,17 @@ class CategoryController extends Controller
     {
         $validated = $request->validated();
 
-        $category = Category::findOrFail($id);
+        $category = $this->categoryService->findById($id);
 
-        $category->name = $validated['name'];
-        $category->save();
+        if (!$category) {
+            return response()->json([
+                'message' => 'Category not found'
+            ], 404);
+        }
+
+        $this->categoryService->update($category, [
+            'name' => $validated['name'],
+        ]);
 
         return response()->json([
             'message' => 'Category updated successfully',
@@ -88,8 +111,15 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $category = Category::findOrFail($id);
-        $category->delete();
+        $category = $this->categoryService->findById($id);
+
+        if (!$category) {
+            return response()->json([
+                'message' => 'Category not found'
+            ], 404);
+        }
+
+        $this->categoryService->delete($category);
 
         return response()->json([
             'message' => 'Category deleted successfully'

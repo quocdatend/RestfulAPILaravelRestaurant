@@ -3,21 +3,27 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Validator;
+use App\Services\UserService;
 use App\Http\Requests\UserRequest;
 
 class AuthController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     public function register(UserRequest $request)
     {
         $validated = $request->validated();
 
-        $user = User::create([
+        $user = $this->userService->createUser([
             'id' => uniqid(),
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -44,7 +50,13 @@ class AuthController extends Controller
             ]);
         }
 
-        $user = User::where('email', $validated['email'])->firstOrFail();
+        $user = $this->userService->findUserByEmail($validated['email']);
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => ['Tài khoản không tồn tại'],
+            ]);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

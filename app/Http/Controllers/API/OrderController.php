@@ -7,15 +7,32 @@ use App\Http\Requests\OrderRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use App\Services\OrderService;
+use App\Services\OrderItemService;
 
 class OrderController extends Controller
 {
+    protected $orderService;
+    protected $orderItemService;
+
+    public function __construct(OrderService $orderService, OrderItemService $orderItemService)
+    {
+        $this->orderService = $orderService;
+        $this->orderItemService = $orderItemService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $orders = Order::all();
+        $orders = $this->orderService->getAllOrders();
+        if ($orders->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No orders found'
+            ], 404);
+        }
         return response()->json([
             'status' => 'success',
             'orders' => $orders
@@ -29,7 +46,7 @@ class OrderController extends Controller
     {
         $validatedData = $request->validated();
 
-        $order = Order::create([
+        $order = $this->orderService->createOrder([
             'id' => uniqid(),
             'user_id' => $validatedData['user_id'],
             'total_price' => $validatedData['total_price'],
@@ -42,7 +59,7 @@ class OrderController extends Controller
             'phone_number' => $validatedData['phone_number'],
         ]);
 
-        $orderItems = OrderItem::create([
+        $orderItems = $this->orderItemService->createOrderItem([
             'id' => uniqid(),
             'order_id' => $validatedData['order_id'],
             'menu_id' => $validatedData['menu_id'],
@@ -89,7 +106,8 @@ class OrderController extends Controller
     {
         $validatedData = $request->validated();
 
-        $order = Order::find($id);
+        $order = $this->orderService->getOrderById($id);
+
         if (!$order) {
             return response()->json([
                 'status' => 'error',
@@ -97,7 +115,7 @@ class OrderController extends Controller
             ], 404);
         }
 
-        $order->update([
+        $this->orderService->updateOrder($order, [
             'user_id' => $validatedData['user_id'],
             'total_price' => $validatedData['total_price'],
             'num_people' => $validatedData['num_people'],
@@ -121,7 +139,7 @@ class OrderController extends Controller
      */
     public function destroy($id)
     {
-        $order = Order::find($id);
+        $order = $this->orderService->getOrderById($id);
         if (!$order) {
             return response()->json([
                 'status' => 'error',
@@ -129,7 +147,7 @@ class OrderController extends Controller
             ], 404);
         }
 
-        $order->delete();
+        $this->orderService->deleteOrder($order);
 
         return response()->json([
             'status' => 'success',
