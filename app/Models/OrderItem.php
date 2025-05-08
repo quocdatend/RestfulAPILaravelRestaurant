@@ -15,5 +15,5 @@ class OrderItem extends Model
         'status',
     ];
 
-    public $timestamps = false; // Nếu bạn không sử dụng timestamps (created_at, updated_at)
+    public $timestamps = true; // Nếu bạn không sử dụng timestamps (created_at, updated_at)
 }

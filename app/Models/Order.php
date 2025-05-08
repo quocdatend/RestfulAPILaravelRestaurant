@@ -20,7 +20,7 @@ class Order extends Model
         'phone_number'
     ];
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     public function user()
     {
