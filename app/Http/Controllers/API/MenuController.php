@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use App\Http\Requests\MenuRequest;
 
 class MenuController extends Controller
 {
@@ -23,33 +24,25 @@ class MenuController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(MenuRequest $request)
     {
         $imagePath = null;
+
+        $validated = $request->validated();
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'price' => 'required|decimal:0,2',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'detail' => 'nullable|string|max:1000',
-            'status' => 'required|integer',
-            'category_id' => 'required|exists:categories,id',
-        ]);
-
         $menu = Menu::create([
             'id' => uniqid(),
-            'name' => $request->name,
-            'price' => $request->price,
-            'description' => $request->description,
+            'name' => $validated['name'],
+            'price' => $validated['price'],
+            'description' => $validated['description'],
             'image' => $imagePath,
-            'detail' => $request->detail,
-            'status' => $request->status,
-            'category_id' => $request->category_id,
+            'detail' => $validated['detail'],
+            'status' => $validated['status'],
+            'category_id' => $validated['category_id'],
         ]);
 
         return response()->json([
@@ -84,26 +77,34 @@ class MenuController extends Controller
     }
 
     /**
+     * Find menus by category.
+     */
+    public function findByCategory($category)
+    {
+        $menus = Menu::where('category_id', $category)->get();
+
+        return response()->json([
+            'status' => 'success',
+            'menus' => $menus
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(MenuRequest $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'category_id' => 'required|exists:categories,id',
-        ]);
+        $validated = $request->validated();
 
         $menu = Menu::findOrFail($id);
 
-        $menu->name = $request->name;
-        $menu->price = $request->price;
-        $menu->description = $request->description;
-        $menu->image = $request->image;
-        $menu->detail = $request->detail;
-        $menu->status = $request->status;
-        $menu->category_id = $request->category_id;
+        $menu->name = $validated['name'];
+        $menu->price = $validated['price'];
+        $menu->description = $validated['description'];
+        $menu->image = $request->hasFile('image') ? $request->file('image')->store('images', 'public') : $menu->image;
+        $menu->detail = $validated['detail'];
+        $menu->status = $validated['status'];
+        $menu->category_id = $validated['category_id'];
         $menu->save();
 
         return response()->json([

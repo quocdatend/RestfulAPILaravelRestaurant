@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -23,15 +24,13 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(CategoryRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $category = Category::create([
             'id' => uniqid(),
-            'name' => $request->name,
+            'name' => $validated['name'],
         ]);
 
         return response()->json([
@@ -49,6 +48,7 @@ class CategoryController extends Controller
         //
     }
 
+
     /**
      * Display the specified resource.
      */
@@ -60,15 +60,13 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, $id)
+    public function edit(CategoryRequest $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $category = Category::findOrFail($id);
 
-        $category->name = $request->name;
+        $category->name = $validated['name'];
         $category->save();
 
         return response()->json([
@@ -88,7 +86,7 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destrop($id)
+    public function destroy($id)
     {
         $category = Category::findOrFail($id);
         $category->delete();

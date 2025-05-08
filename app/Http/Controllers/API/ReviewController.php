@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Reviews;
 use Illuminate\Http\Request;
-use Review;
+use App\Http\Requests\ReviewRequest;
 
 class ReviewController extends Controller
 {
@@ -24,18 +24,15 @@ class ReviewController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(ReviewRequest $request)
     {
-        // Validate the request data
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-        ]);
+        $validated = $request->validated();
 
         $review = Reviews::create([
             'id' => uniqid(),
             'user_id' => $request->user()->id,
-            'rating' => $request->rating,
-            'comment' => $request->comment,
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'],
         ]);
 
         return response()->json([

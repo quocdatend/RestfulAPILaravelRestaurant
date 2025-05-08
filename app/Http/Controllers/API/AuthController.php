@@ -8,22 +8,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\UserRequest;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(UserRequest $request)
     {
-         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users|max:255',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $validated = $request->validated();
 
         $user = User::create([
             'id' => uniqid(),
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
             'role' => 'user',
         ]);
 
@@ -36,20 +34,17 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(Request $request)
+    public function login(UserRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $validated = $request->validated();
+        
+        if (!Auth::attempt($validated)) {
             throw ValidationException::withMessages([
                 'email' => ['Tài khoản hoặc mật khẩu không chính xác'],
             ]);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = User::where('email', $validated['email'])->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
