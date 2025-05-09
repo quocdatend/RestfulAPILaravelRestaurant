@@ -24,7 +24,7 @@ class OrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
+            // 'user_id' => 'required|exists:users,id',
             'total_price' => 'required|decimal:0,2',
             'num_people' => 'required|integer',
             'special_request' => 'nullable|string|max:255',
@@ -33,7 +33,7 @@ class OrderRequest extends FormRequest
             'order_time' => 'required|date_format:H:i',
             'style_tiec' => 'required|string|max:255',
             'phone_number' => 'required|string|max:15',
-            'order_id' => 'required|exists:orders,id',
+            // 'order_id' => 'required|exists:orders,id',
             'menu_id' => 'required|exists:menus,id',
             'quantity' => 'required|integer|min:1',
         ];

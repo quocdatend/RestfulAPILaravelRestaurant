@@ -24,7 +24,7 @@ class AuthController extends Controller
         $validated = $request->validated();
 
         $user = $this->userService->createUser([
-            'id' => uniqid(),
+            'id' => str_pad(mt_rand(0, 9999999999999), 13, '0', STR_PAD_LEFT),
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
@@ -40,17 +40,16 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(UserRequest $request)
+    public function login(Request $request)
     {
-        $validated = $request->validated();
         
-        if (!Auth::attempt($validated)) {
+        if (!Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => ['Tài khoản hoặc mật khẩu không chính xác'],
             ]);
         }
 
-        $user = $this->userService->findUserByEmail($validated['email']);
+        $user = $this->userService->findUserByEmail($request->email);
         if (!$user) {
             throw ValidationException::withMessages([
                 'email' => ['Tài khoản không tồn tại'],

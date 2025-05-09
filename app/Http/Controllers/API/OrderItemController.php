@@ -36,25 +36,25 @@ class OrderItemController extends Controller
      */
     public function create(Request $request)
     {
-        // $request->validate([
-        //     'order_id' => 'required|exists:orders,id',
-        //     'menu_id' => 'required|exists:menus,id',
-        //     'quantity' => 'required|integer|min:1',
-        // ]);
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'menu_id' => 'required|exists:menus,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
 
-        // $orderItem = OrderItem::create([
-        //     'id' => uniqid(),
-        //     'order_id' => $request->order_id,
-        //     'menu_id' => $request->menu_id,
-        //     'quantity' => $request->quantity,
-        //     'status' => 0,
-        // ]);
+        $orderItem = OrderItem::create([
+            'id' => uniqid(),
+            'order_id' => $request->order_id,
+            'menu_id' => $request->menu_id,
+            'quantity' => $request->quantity,
+            'status' => 0,
+        ]);
 
-        // return response()->json([
-        //     'status' => 'success',
-        //     'message' => 'Order item created successfully',
-        //     'order_item' => $orderItem
-        // ]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order item created successfully',
+            'order_item' => $orderItem
+        ]);
     }
 
     /**

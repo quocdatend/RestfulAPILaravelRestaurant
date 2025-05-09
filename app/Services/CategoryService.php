@@ -66,6 +66,17 @@ class CategoryService
     }
 
     /**
+     * Find a category by slug.
+     *
+     * @param string $slug
+     * @return Category|null
+     */
+    public function findBySlug($slug)
+    {
+        return $this->category->where('slug', $slug)->first();
+    }
+
+    /**
      * Delete a category.
      *
      * @param Category $category

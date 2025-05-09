@@ -11,7 +11,7 @@ class AdminUserSeeder extends Seeder
     public function run()
     {
         User::create([
-            'id' => uniqid(), // Tạo ID ngẫu nhiên
+            'id' => str_pad(mt_rand(0, 9999999999999), 13, '0', STR_PAD_LEFT), // Tạo ID ngẫu nhiên
             'name' => 'Admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),

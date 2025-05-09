@@ -45,7 +45,20 @@ class OrderController extends Controller
     public function create(OrderRequest $request)
     {
         $validatedData = $request->validated();
-
+        // example test postman
+        // {
+        //     "user_id": "1",
+        //     "total_price": 100000,
+        //     "num_people": 10,
+        //     "special_request": "No spicy",
+        //     "customer_name": "John Doe",
+        //     "order_date": "2023-10-01",
+        //     "order_time": "18:00",
+        //     "style_tiec": "Buffet",
+        //     "phone_number": "1234567890",
+        //     "menu_id": "1",
+        //     "quantity": 2
+        // }
         $order = $this->orderService->createOrder([
             'id' => uniqid(),
             'user_id' => $validatedData['user_id'],
@@ -59,13 +72,13 @@ class OrderController extends Controller
             'phone_number' => $validatedData['phone_number'],
         ]);
 
-        $orderItems = $this->orderItemService->createOrderItem([
-            'id' => uniqid(),
-            'order_id' => $validatedData['order_id'],
-            'menu_id' => $validatedData['menu_id'],
-            'quantity' => $validatedData['quantity'],
-            'status' => 0,
-        ]);
+        // $orderItems = $this->orderItemService->createOrderItem([
+        //     'id' => uniqid(),
+        //     'order_id' => $validatedData['order_id'],
+        //     'menu_id' => $validatedData['menu_id'],
+        //     'quantity' => $validatedData['quantity'],
+        //     'status' => 0,
+        // ]);
 
         return response()->json([
             'status' => 'success',

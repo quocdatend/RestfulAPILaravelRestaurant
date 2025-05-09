@@ -38,7 +38,7 @@ class ReviewController extends Controller
 
         $review = $this->reviewService->createReview([
             'id' => uniqid(),
-            'user_id' => $request->user()->id,
+            'name' => $request->user()->name,
             'rating' => $validated['rating'],
             'comment' => $validated['comment'],
         ]);
