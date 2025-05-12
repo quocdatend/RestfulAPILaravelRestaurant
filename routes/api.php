@@ -9,6 +9,7 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\MenuController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\OrderItemController;
+use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\API\StripePaymentsController;
 
 // Auth
@@ -76,6 +77,8 @@ Route::prefix('order')->group(function () {
         Route::middleware('user')->group(function () {
             Route::post('/create', [OrderController::class, 'create']);
             Route::put('/update/{order}', [OrderController::class, 'update']);
+            Route::put('/updateStatus/{order}', [OrderController::class, 'updateStatus']);
+            Route::put('/updateStatusCancel/{order}', [OrderController::class, 'updateStatusCancel']);
             Route::delete('/delete/{order}', [OrderController::class, 'destroy']);
         });
     });
@@ -103,6 +106,21 @@ Route::prefix('payment')->group(function () {
             Route::get('/', [StripePaymentsController::class, 'index']);
             Route::post('/create', [StripePaymentsController::class, 'payment']);
             Route::get('/complete', [StripePaymentsController::class, 'complete']);
+        });
+    });
+});
+
+// Party
+Route::prefix('party')->group(function () {
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/', [PartyController::class, 'index']);
+        // Route::get('/{id}', [PartyController::class, 'getPartyById']);
+
+        Route::middleware('admin')->group(function () {
+            Route::post('/create', [PartyController::class, 'create']);
+            Route::put('/update', [PartyController::class, 'update']);
+            Route::delete('/delete/{id}', [PartyController::class, 'destroy']);
         });
     });
 });
