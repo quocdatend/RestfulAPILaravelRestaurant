@@ -8,17 +8,19 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Address;
 
-class SendMail extends Mailable
+class SendMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    // public $data;
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(private $name)
     {
-        //
+        // $this->data = $data;
     }
 
     /**
@@ -27,7 +29,8 @@ class SendMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Send Mail',
+            // from: new Address('example@example.com', 'Test Sender'),
+            subject: 'Test Email',
         );
     }
 
@@ -37,7 +40,8 @@ class SendMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'welcome',
+            with: ['name' => $this->name],
         );
     }
 
