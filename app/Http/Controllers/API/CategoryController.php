@@ -3,17 +3,35 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Requests\CategoryRequest;
+use App\Models\Category;
+use App\Services\CategoryService;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
+    /**
+     * @var CategoryService
+     */
+    protected $categoryService;
+
+    /**
+     * CategoryController constructor.
+     *
+     * @param CategoryService $categoryService
+     */
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $categories = Category::all();
+        $categories = $this->categoryService->getAllCategories();
         return response()->json([
             'status' => 'success',
             'categories' => $categories
@@ -23,15 +41,21 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(CategoryRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+        $imagePath = null;
 
-        $category = Category::create([
+        $validated = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images', 'public');
+        }
+
+        $category = $this->categoryService->create([
             'id' => uniqid(),
-            'name' => $request->name,
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
+            'image' => $imagePath,
         ]);
 
         return response()->json([
@@ -49,6 +73,7 @@ class CategoryController extends Controller
         //
     }
 
+
     /**
      * Display the specified resource.
      */
@@ -58,18 +83,43 @@ class CategoryController extends Controller
     }
 
     /**
+     * Display the specified resource by slug.
+     */
+    public function findBySlug($slug)
+    {
+        $category = $this->categoryService->findBySlug($slug);
+
+        if (!$category) {
+            return response()->json([
+                'message' => 'Category not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'category' => $category
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, $id)
+    public function edit(CategoryRequest $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validated();
+
+        $category = $this->categoryService->findById($id);
+
+        if (!$category) {
+            return response()->json([
+                'message' => 'Category not found'
+            ], 404);
+        }
+
+        $this->categoryService->update($category, [
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
         ]);
-
-        $category = Category::findOrFail($id);
-
-        $category->name = $request->name;
-        $category->save();
 
         return response()->json([
             'message' => 'Category updated successfully',
@@ -80,18 +130,54 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $id)
     {
-        //
+        $category = $this->categoryService->findById($id);
+
+        if (!$category) {
+            return response()->json([
+                'message' => 'Category not found'
+            ], 404);
+        }
+        // image
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images', 'public');
+        } else {
+            $imagePath = $category->image;
+        }
+
+        // if name is not empty
+        if ($request->name) {
+            $category->name = $request->name;
+            $category->slug = Str::slug($request->name);
+        }
+
+        $this->categoryService->update($category, [
+            'name' => $category->name,
+            'slug' => $category->slug,
+            'image' => $imagePath,
+        ]);
+
+        return response()->json([
+            'message' => 'Category updated successfully',
+            'category' => $category
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destrop($id)
+    public function destroy($id)
     {
-        $category = Category::findOrFail($id);
-        $category->delete();
+        $category = $this->categoryService->findById($id);
+
+        if (!$category) {
+            return response()->json([
+                'message' => 'Category not found'
+            ], 404);
+        }
+
+        $this->categoryService->delete($category);
 
         return response()->json([
             'message' => 'Category deleted successfully'

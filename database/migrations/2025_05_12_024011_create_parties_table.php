@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) {
-            $table->string('id', 13)->primary();
-            $table->string('name', 30);
-            $table->text('comment')->nullable();
-            $table->integer('rating');
-            $table->timestamps();
+        Schema::create('parties', function (Blueprint $table) {
+            $table->string('id',13)->primary();
+            $table->string('name', 255);
         });
     }
 
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reviews');
+        Schema::dropIfExists('parties');
     }
 };

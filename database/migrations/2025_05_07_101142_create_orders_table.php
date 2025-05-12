@@ -21,8 +21,9 @@ return new class extends Migration
             $table->string('customer_name');
             $table->date('order_date');
             $table->time('order_time');
-            $table->string('style_tiec')->nullable();
+            $table->string('party_id', 13)->nullable();
             $table->string('phone_number')->nullable();
+            $table->integer('status')->default(0);
             $table->timestamps();
         });
     }

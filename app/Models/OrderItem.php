@@ -12,8 +12,17 @@ class OrderItem extends Model
         'order_id',
         'menu_id',
         'quantity',
-        'status',
+        'price',
+        'total_price'
     ];
 
-    public $timestamps = false; // Nếu bạn không sử dụng timestamps (created_at, updated_at)
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class, 'menu_id', 'id');
+    }
 }

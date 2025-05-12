@@ -17,7 +17,9 @@ return new class extends Migration
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->string('menu_id',13);
             $table->integer('quantity')->default(1);
-            $table->integer('status')->default(0);
+            $table->decimal('price', 10, 2);
+            $table->decimal('total_price', 10, 2);
+            $table->timestamps();
         });
     }
 

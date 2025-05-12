@@ -13,7 +13,9 @@ class Category extends Model
 
     protected $fillable = [
         'id',
-        'name'
+        'name',
+        'slug',
+        'image'
     ];
 
     public function menus()

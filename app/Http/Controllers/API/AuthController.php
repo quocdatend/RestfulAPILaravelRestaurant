@@ -3,27 +3,31 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Services\UserService;
+use App\Http\Requests\UserRequest;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
-    {
-         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users|max:255',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+    protected $userService;
 
-        $user = User::create([
-            'id' => uniqid(),
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
+    public function register(UserRequest $request)
+    {
+        $validated = $request->validated();
+
+        $user = $this->userService->createUser([
+            'id' => str_pad(mt_rand(0, 9999999999999), 13, '0', STR_PAD_LEFT),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
             'role' => 'user',
         ]);
 
@@ -38,18 +42,20 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
+        
         if (!Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => ['Tài khoản hoặc mật khẩu không chính xác'],
             ]);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = $this->userService->findUserByEmail($request->email);
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => ['Tài khoản không tồn tại'],
+            ]);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

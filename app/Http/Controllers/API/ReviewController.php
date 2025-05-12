@@ -5,16 +5,24 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Reviews;
 use Illuminate\Http\Request;
-use Review;
+use App\Http\Requests\ReviewRequest;
+use App\Services\ReviewService;
 
 class ReviewController extends Controller
 {
+    protected $reviewService;
+
+    public function __construct(ReviewService $reviewService)
+    {
+        $this->reviewService = $reviewService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $reviews = Reviews::all();
+        $reviews = $this->reviewService->getAllReviews();
         return response()->json([
             'status' => 'success',
             'reviews' => $reviews
@@ -24,18 +32,15 @@ class ReviewController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(ReviewRequest $request)
     {
-        // Validate the request data
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-        ]);
+        $validated = $request->validated();
 
-        $review = Reviews::create([
+        $review = $this->reviewService->createReview([
             'id' => uniqid(),
-            'user_id' => $request->user()->id,
-            'rating' => $request->rating,
-            'comment' => $request->comment,
+            'name' => $request->user()->name,
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'],
         ]);
 
         return response()->json([
