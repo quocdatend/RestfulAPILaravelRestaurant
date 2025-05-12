@@ -61,15 +61,16 @@ class OrderController extends Controller
         // }
         $order = $this->orderService->createOrder([
             'id' => uniqid(),
-            'user_id' => $validatedData['user_id'],
+            'user_id' => $request->user()->id,
             'total_price' => $validatedData['total_price'],
             'num_people' => $validatedData['num_people'],
             'special_request' => $validatedData['special_request'],
             'customer_name' => $validatedData['customer_name'],
             'order_date' => $validatedData['order_date'],
             'order_time' => $validatedData['order_time'],
-            'style_tiec' => $validatedData['style_tiec'],
+            'party_id' => $validatedData['party_id'],
             'phone_number' => $validatedData['phone_number'],
+            'status' => 0,
         ]);
 
         // $orderItems = $this->orderItemService->createOrderItem([
@@ -84,7 +85,7 @@ class OrderController extends Controller
             'status' => 'success',
             'message' => 'Order and Order Item created successfully',
             'order' => $order,
-            'order_items' => $orderItems
+            // 'order_items' => $orderItems
         ]);
     }
 
@@ -130,19 +131,98 @@ class OrderController extends Controller
 
         $this->orderService->updateOrder($order, [
             'user_id' => $validatedData['user_id'],
-            'total_price' => $validatedData['total_price'],
+            'total_price' => 0,
             'num_people' => $validatedData['num_people'],
             'special_request' => $validatedData['special_request'],
             'customer_name' => $validatedData['customer_name'],
             'order_date' => $validatedData['order_date'],
             'order_time' => $validatedData['order_time'],
-            'style_tiec' => $validatedData['style_tiec'],
+            'party_id' => $validatedData['party_id'],
             'phone_number' => $validatedData['phone_number'],
         ]);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Order updated successfully',
+            'order' => $order
+        ]);
+    }
+
+    /**
+     * update price
+     */
+    public function updatePrice(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'total_price' => 'required|numeric|min:0',
+        ]);
+
+        $order = $this->orderService->getOrderById($id);
+
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        $this->orderService->updateOrder($order, [
+            'total_price' => $validatedData['total_price'],
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order price updated successfully',
+            'order' => $order
+        ]);
+    }
+
+    /**
+     * update status order complete
+     */
+    public function updateStatus($id)
+    {
+        $order = $this->orderService->getOrderById($id);
+
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        $this->orderService->updateOrder($order, [
+            'status' => 1,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order status updated successfully',
+            'order' => $order
+        ]);
+    }
+
+    /**
+     * update status order cancel
+     */
+    public function updateStatusCancel($id)
+    {
+        $order = $this->orderService->getOrderById($id);
+
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        $this->orderService->updateOrder($order, [
+            'status' => -1,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order status updated successfully',
             'order' => $order
         ]);
     }

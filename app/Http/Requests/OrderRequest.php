@@ -31,11 +31,12 @@ class OrderRequest extends FormRequest
             'customer_name' => 'required|string|max:255',
             'order_date' => 'required|date|after_or_equal:today',
             'order_time' => 'required|date_format:H:i',
-            'style_tiec' => 'required|string|max:255',
+            'party_id' => 'required|exists:parties,id',
             'phone_number' => 'required|string|max:15',
+            'status' => 'integer|in:-1,0,1',
             // 'order_id' => 'required|exists:orders,id',
-            'menu_id' => 'required|exists:menus,id',
-            'quantity' => 'required|integer|min:1',
+            // 'menu_id' => 'required|exists:menus,id',
+            // 'quantity' => 'required|integer|min:1',
         ];
     }
 

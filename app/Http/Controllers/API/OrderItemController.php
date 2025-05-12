@@ -34,19 +34,15 @@ class OrderItemController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create(OrderItemRequest $request)
     {
-        $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'menu_id' => 'required|exists:menus,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $orderItem = OrderItem::create([
             'id' => uniqid(),
-            'order_id' => $request->order_id,
-            'menu_id' => $request->menu_id,
-            'quantity' => $request->quantity,
+            'order_id' => $validated['order_id'],
+            'menu_id' => $validated['menu_id'],
+            'quantity' => $validated['quantity'],
             'status' => 0,
         ]);
 

@@ -16,8 +16,9 @@ class Order extends Model
         'customer_name',
         'order_date',
         'order_time',
-        'style_tiec',
-        'phone_number'
+        'party_id',
+        'phone_number',
+        'status',
     ];
 
     public $timestamps = true;
@@ -30,5 +31,10 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id');
+    }
+
+    public function party()
+    {
+        return $this->belongsTo(Party::class, 'party_id');
     }
 }

@@ -26,8 +26,7 @@ class OrderItemRequest extends FormRequest
         return [
             'order_id' => 'required|exists:orders,id',
             'menu_id' => 'required|exists:menus,id',
-            'quantity' => 'required|integer|min:1',
-            'status' => 'required|integer|in:-1,0,1',
+            'quantity' => 'required|integer|min:1'
         ];
     }
 
