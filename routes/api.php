@@ -12,7 +12,9 @@ use App\Http\Controllers\API\OrderItemController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\API\StripePaymentsController;
 use App\Http\Controllers\API\EmailController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\API\VerificationController;
+use App\Http\Controllers\Api\VnpayController;
 use App\Mail\SendMail;
 use Illuminate\Support\Facades\Mail;
 
@@ -104,15 +106,26 @@ Route::prefix('order-item')->group(function () {
 });
 
 // Stripe payment routes
+// Route::prefix('payment')->group(function () {
+//     Route::middleware('auth:sanctum')->group(function () {
+//         Route::middleware('user')->group(function () {
+//             Route::get('/', [StripePaymentsController::class, 'index']);
+//             Route::post('/create', [StripePaymentsController::class, 'payment']);
+//             Route::get('/complete', [StripePaymentsController::class, 'complete']);
+//         });
+//     });
+// });
+
+// vnpay
 Route::prefix('payment')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('user')->group(function () {
-            Route::get('/', [StripePaymentsController::class, 'index']);
-            Route::post('/create', [StripePaymentsController::class, 'payment']);
-            Route::get('/complete', [StripePaymentsController::class, 'complete']);
+            Route::post('/create', [VnpayController::class, 'createPayment'])->name('payment.create');
         });
     });
+    Route::get('/return', [VnPayController::class, 'vnpayReturn'])->name('vnpay.return');
 });
+
 
 // Party
 Route::prefix('party')->group(function () {
@@ -137,7 +150,7 @@ Route::prefix('email')->group(function () {
         });
     });
 });
-Route::get('/send-email', function() {
+Route::get('/send-email', function () {
     $name = "Funny Coder";
     // The email sending is done using the to method on the Mail facade
     Mail::to('testreceiver@gmail.com')->send(new SendMail($name));
