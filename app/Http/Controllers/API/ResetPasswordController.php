@@ -29,22 +29,32 @@ class ResetPasswordController extends Controller
         ]);
     }
 
-    public function reset(Request $request, $token)
+    // show view reset password if token is valid
+    public function showResetForm(Request $request)
     {
+        $token = $request->query('token');
         $passwordReset = PasswordReset::where('token', $token)->firstOrFail();
-        if (Carbon::parse($passwordReset->updated_at)->addMinutes(720)->isPast()) {
-            $passwordReset->delete();
-
+        // check token is valid
+        if(!$passwordReset) {
             return response()->json([
                 'message' => 'This password reset token is invalid.',
             ], 422);
         }
+        return view('auth.reset-password', ['token' => $token]);
+    }
+
+    public function reset(Request $request)
+    {
+        $passwordReset = PasswordReset::where('token', $request->token)->firstOrFail();
+        if (Carbon::parse($passwordReset->updated_at)->addMinutes(720)->isPast()) {
+            $passwordReset->delete();
+
+            return view('auth.reset-fail');
+        }
         $user = User::where('email', $passwordReset->email)->firstOrFail();
-        $updatePasswordUser = $user->update($request->only('password'));
+        // $updatePasswordUser = $user->update($request->only('password'));
         $passwordReset->delete();
 
-        return response()->json([
-            'success' => $updatePasswordUser,
-        ]);
+        return view('auth.reset-success');
     }
 }

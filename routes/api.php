@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Mail;
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -158,4 +158,5 @@ Route::get('/send-email', function () {
 
 // reset password
 Route::post('/forgot-password', [ResetPasswordController::class, 'sendMail']);
-Route::put('/reset-password/{token}', [ResetPasswordController::class, 'reset']);
+Route::get('/form-reset-password', [ResetPasswordController::class, 'showResetForm']);
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
