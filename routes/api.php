@@ -12,7 +12,7 @@ use App\Http\Controllers\API\OrderItemController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\API\StripePaymentsController;
 use App\Http\Controllers\API\EmailController;
-use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\API\ResetPasswordController;
 use App\Http\Controllers\API\VerificationController;
 use App\Http\Controllers\Api\VnpayController;
 use App\Mail\SendMail;
@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Mail;
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -155,3 +155,8 @@ Route::get('/send-email', function () {
     // The email sending is done using the to method on the Mail facade
     Mail::to('testreceiver@gmail.com')->send(new SendMail($name));
 });
+
+// reset password
+Route::post('/forgot-password', [ResetPasswordController::class, 'sendMail']);
+Route::get('/form-reset-password', [ResetPasswordController::class, 'showResetForm']);
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
