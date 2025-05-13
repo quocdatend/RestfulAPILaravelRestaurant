@@ -12,7 +12,7 @@ use App\Http\Controllers\API\OrderItemController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\API\StripePaymentsController;
 use App\Http\Controllers\API\EmailController;
-use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\API\ResetPasswordController;
 use App\Http\Controllers\API\VerificationController;
 use App\Http\Controllers\Api\VnpayController;
 use App\Mail\SendMail;
@@ -155,3 +155,7 @@ Route::get('/send-email', function () {
     // The email sending is done using the to method on the Mail facade
     Mail::to('testreceiver@gmail.com')->send(new SendMail($name));
 });
+
+// reset password
+Route::post('/forgot-password', [ResetPasswordController::class, 'sendMail']);
+Route::put('/reset-password/{token}', [ResetPasswordController::class, 'reset']);
