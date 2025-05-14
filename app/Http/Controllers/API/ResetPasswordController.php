@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Services\UserService;
 use App\Models\PasswordReset;
 use App\Notifications\ResetPasswordRequest;
 use Illuminate\Support\Str;
@@ -12,9 +13,19 @@ use Carbon\Carbon;
 
 class ResetPasswordController extends Controller
 {
+    protected $userService;
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
     public function sendMail(Request $request)
     {
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = $this->userService->findUserByEmail($request->email);
+        if (!$user) {
+            return response()->json([
+                'message' => 'We can\'t find a user with that e-mail address.',
+            ], 422);
+        }
         $passwordReset = PasswordReset::updateOrCreate([
             'email' => $user->email,
         ], [

@@ -8,11 +8,11 @@ class Order extends Model
 {
     protected $table = 'orders';
     protected $fillable = [
-        'id',
+        'order_id',
         'user_id',
         'total_price',
         'num_people',
-        'special_request',
+        'special_request_id',
         'customer_name',
         'order_date',
         'order_time',

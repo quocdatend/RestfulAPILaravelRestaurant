@@ -3,10 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ReviewRequest extends FormRequest
+class OrderNoteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,16 +22,7 @@ class ReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rating' => 'required|numeric|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
+            'note' => 'required|string|unique:order_notes,note|max:255',
         ];
-    }
-
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(response()->json([
-            'message' => 'Validation failed',
-            'errors' => $validator->errors(),
-        ], 422));
     }
 }

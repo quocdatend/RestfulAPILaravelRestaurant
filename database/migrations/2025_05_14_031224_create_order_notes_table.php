@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parties', function (Blueprint $table) {
-            $table->string('party_id',13)->primary();
-            $table->string('name', 255);
+        Schema::create('order_notes', function (Blueprint $table) {
+            $table->string('order_note_id', 13)->primary();
+            $table->string('note')->unique();
         });
     }
 
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parties');
+        Schema::dropIfExists('order_notes');
     }
 };

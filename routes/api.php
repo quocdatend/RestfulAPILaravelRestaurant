@@ -12,6 +12,7 @@ use App\Http\Controllers\API\OrderItemController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\API\StripePaymentsController;
 use App\Http\Controllers\API\EmailController;
+use App\Http\Controllers\Api\OrderNoteController;
 use App\Http\Controllers\API\ResetPasswordController;
 use App\Http\Controllers\API\VerificationController;
 use App\Http\Controllers\Api\VnpayController;
@@ -82,6 +83,8 @@ Route::prefix('order')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('user')->group(function () {
             Route::post('/create', [OrderController::class, 'create']);
+            Route::get('/findByUser', [OrderController::class, 'indexByUser']);
+            Route::get('/cancelByUser/{orderId}', [OrderController::class, 'cancelOrder']);
             Route::put('/update/{order}', [OrderController::class, 'update']);
             Route::put('/updateStatus/{order}', [OrderController::class, 'updateStatus']);
             Route::put('/updateStatusCancel/{order}', [OrderController::class, 'updateStatusCancel']);
@@ -132,7 +135,7 @@ Route::prefix('party')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [PartyController::class, 'index']);
-        // Route::get('/{id}', [PartyController::class, 'getPartyById']);
+        Route::get('/{partyId}', [PartyController::class, 'getPartyByPartyId']);
 
         Route::middleware('admin')->group(function () {
             Route::post('/create', [PartyController::class, 'create']);
@@ -160,3 +163,19 @@ Route::get('/send-email', function () {
 Route::post('/forgot-password', [ResetPasswordController::class, 'sendMail']);
 Route::get('/form-reset-password', [ResetPasswordController::class, 'showResetForm']);
 Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+
+// order notes
+Route::prefix('order-note')->group(function () {
+    Route::get('/', [OrderNoteController::class, 'index']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::middleware('user')->group(function () {
+            Route::get('/{orderNote}', [OrderNoteController::class, 'getByOrderNoteId']);
+        });
+        Route::middleware('admin')->group(function () {
+            Route::post('/create', [OrderNoteController::class, 'store']);
+            Route::put('/update/{orderNote}', [OrderNoteController::class, 'update']);
+            Route::delete('/delete/{orderNote}', [OrderNoteController::class, 'destroy']);
+        });
+    });
+});

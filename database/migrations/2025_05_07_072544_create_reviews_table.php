@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('id', 13)->primary();
             $table->string('name', 30);
             $table->text('comment')->nullable();
-            $table->integer('rating');
+            $table->decimal('rating', 2, 1)->check('rating >= 1 AND rating <= 5');
             $table->timestamps();
         });
     }

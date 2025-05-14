@@ -25,12 +25,7 @@ class PartyController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'parties' => $parties->map(function ($party) {
-                return [
-                    'id' => (string) $party->id,
-                    'name' => $party->name
-                ];
-            })
+            'parties' => $parties
         ]);
     }
 
@@ -38,7 +33,7 @@ class PartyController extends Controller
     {
         $validatedData = $request->validated();
         $party = $this->partyService->createParty([
-            'id' => uniqid(),
+            'party_id' => uniqid(),
             'name' => $validatedData['name'],
         ]);
         return response()->json([
@@ -61,6 +56,22 @@ class PartyController extends Controller
         $party = $this->partyService->updateParty($party, [
             'name' => $validatedData['name'],
         ]);
+        return response()->json([
+            'status' => 'success',
+            'party' => $party
+        ]);
+    }
+
+    // get by party id
+    public function getPartyByPartyId($partyId)
+    {
+        $party = $this->partyService->getPartyByPartyId($partyId);
+        if (!$party) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Party not found'
+            ], 404);
+        }
         return response()->json([
             'status' => 'success',
             'party' => $party
