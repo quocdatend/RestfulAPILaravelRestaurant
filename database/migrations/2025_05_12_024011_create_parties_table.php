@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('parties', function (Blueprint $table) {
-            $table->string('id',13)->primary();
+            $table->string('party_id',13)->primary();
             $table->string('name', 255);
         });
     }

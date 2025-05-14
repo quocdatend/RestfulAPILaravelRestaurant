@@ -27,6 +27,12 @@ class PartyService
     {
         return Party::find($id);
     }
+    
+    // get by party id
+    public function getPartyByPartyId($partyId)
+    {
+        return Party::where('party_id', $partyId)->first();
+    }
 
     /**
      * Create a new party.

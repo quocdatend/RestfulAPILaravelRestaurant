@@ -10,7 +10,7 @@ class Party extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
     protected $fillable = [
-        'id',
+        'party_id',
         'name',
     ];
 }

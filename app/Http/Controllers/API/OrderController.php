@@ -40,31 +40,36 @@ class OrderController extends Controller
     }
 
     /**
+     * Display a listing of the resource by user.
+     */
+    public function indexByUser(Request $request)
+    {
+        $userId = $request->user()->id;
+        $orders = $this->orderService->getOrdersByUserId($userId);
+        if ($orders->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No orders found for this user'
+            ], 404);
+        }
+        return response()->json([
+            'status' => 'success',
+            'orders' => $orders
+        ]);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create(OrderRequest $request)
     {
         $validatedData = $request->validated();
-        // example test postman
-        // {
-        //     "user_id": "1",
-        //     "total_price": 100000,
-        //     "num_people": 10,
-        //     "special_request": "No spicy",
-        //     "customer_name": "John Doe",
-        //     "order_date": "2023-10-01",
-        //     "order_time": "18:00",
-        //     "style_tiec": "Buffet",
-        //     "phone_number": "1234567890",
-        //     "menu_id": "1",
-        //     "quantity": 2
-        // }
         $order = $this->orderService->createOrder([
-            'id' => uniqid(),
+            'order_id' => uniqid(),
             'user_id' => $request->user()->id,
-            'total_price' => $validatedData['total_price'],
+            'total_price' => 0,
             'num_people' => $validatedData['num_people'],
-            'special_request' => $validatedData['special_request'],
+            'special_request_id' => $validatedData['special_request_id'],
             'customer_name' => $validatedData['customer_name'],
             'order_date' => $validatedData['order_date'],
             'order_time' => $validatedData['order_time'],
@@ -72,14 +77,6 @@ class OrderController extends Controller
             'phone_number' => $validatedData['phone_number'],
             'status' => 0,
         ]);
-
-        // $orderItems = $this->orderItemService->createOrderItem([
-        //     'id' => uniqid(),
-        //     'order_id' => $validatedData['order_id'],
-        //     'menu_id' => $validatedData['menu_id'],
-        //     'quantity' => $validatedData['quantity'],
-        //     'status' => 0,
-        // ]);
 
         return response()->json([
             'status' => 'success',
@@ -133,7 +130,7 @@ class OrderController extends Controller
             'user_id' => $validatedData['user_id'],
             'total_price' => 0,
             'num_people' => $validatedData['num_people'],
-            'special_request' => $validatedData['special_request'],
+            'special_request_id' => $validatedData['special_request_id'],
             'customer_name' => $validatedData['customer_name'],
             'order_date' => $validatedData['order_date'],
             'order_time' => $validatedData['order_time'],
@@ -226,7 +223,29 @@ class OrderController extends Controller
             'order' => $order
         ]);
     }
+    
+    // cancel or by user
+    public function cancelOrder($orderId)
+    {
+        $order = $this->orderService->getOrderByOrderId($orderId);
 
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        $this->orderService->updateOrder($order, [
+            'status' => -1,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order cancelled successfully',
+            'order' => $order
+        ]);
+    }
     /**
      * Remove the specified resource from storage.
      */

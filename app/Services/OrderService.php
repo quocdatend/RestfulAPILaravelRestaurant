@@ -29,6 +29,27 @@ class OrderService
     {
         return Order::find($id);
     }
+    /**
+     * Get an order by order ID.
+     *
+     * @param string $orderId
+     * @return \App\Models\Order|null
+     */
+    public function getOrderByOrderId(string $orderId)
+    {
+        return Order::where('order_id', $orderId)->first();
+    }
+
+    /**
+     * Get orders by user ID.
+     *
+     * @param string $userId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getOrdersByUserId(string $userId)
+    {
+        return Order::where('user_id', $userId)->get();
+    }
 
     /**
      * Create a new order.
@@ -50,7 +71,7 @@ class OrderService
      */
     public function updateOrder(Order $order, array $data)
     {
-        return $order->update($data);
+        return Order::where('order_id', $order->order_id)->update($data);
     }
 
     /**
