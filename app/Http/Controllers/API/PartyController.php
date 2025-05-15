@@ -62,6 +62,26 @@ class PartyController extends Controller
         ]);
     }
 
+    public function updateByPartyId(PartyRequest $request, $partyId)
+    {
+        $validatedData = $request->validated();
+
+        $party = $this->partyService->getPartyByPartyId($partyId);
+        if (!$party) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Party not found'
+            ], 404);
+        }
+        $party = $this->partyService->updateByPartyId($party, [
+            'name' => $validatedData['name'],
+        ]);
+        return response()->json([
+            'status' => 'success',
+            'party' => $party
+        ]);
+    }
+
     // get by party id
     public function getPartyByPartyId($partyId)
     {
@@ -95,7 +115,7 @@ class PartyController extends Controller
 
     public function destroy($id)
     {
-        $party = $this->partyService->getPartyById($id);
+        $party = $this->partyService->getPartyByPartyId($id);
         if (!$party) {
             return response()->json([
                 'status' => 'error',

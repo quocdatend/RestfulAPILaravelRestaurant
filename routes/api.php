@@ -56,7 +56,7 @@ Route::prefix('category')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('admin')->group(function () {
             Route::post('/create', [CategoryController::class, 'create']);
-            Route::put('/update/{category}', [CategoryController::class, 'update']);
+            Route::post('/update/{category}', [CategoryController::class, 'update']);
             Route::delete('/delete/{category}', [CategoryController::class, 'destroy']);
         });
     });
@@ -78,8 +78,7 @@ Route::prefix('menu')->group(function () {
 
 // order
 Route::prefix('order')->group(function () {
-    Route::get('/', [OrderController::class, 'index']);
-
+    
     Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('user')->group(function () {
             Route::post('/create', [OrderController::class, 'create']);
@@ -89,6 +88,10 @@ Route::prefix('order')->group(function () {
             Route::put('/updateStatus/{order}', [OrderController::class, 'updateStatus']);
             Route::put('/updateStatusCancel/{order}', [OrderController::class, 'updateStatusCancel']);
             Route::delete('/delete/{order}', [OrderController::class, 'destroy']);
+        });
+
+        Route::middleware('admin')->group(function () {
+            Route::get('/', [OrderController::class, 'index']);
         });
     });
 });
@@ -139,8 +142,8 @@ Route::prefix('party')->group(function () {
 
         Route::middleware('admin')->group(function () {
             Route::post('/create', [PartyController::class, 'create']);
-            Route::put('/update', [PartyController::class, 'update']);
-            Route::delete('/delete/{id}', [PartyController::class, 'destroy']);
+            Route::post('/updateByPartyId/{id}', [PartyController::class, 'updateByPartyId']);
+            Route::get('/delete/{id}', [PartyController::class, 'destroy']);
         });
     });
 });
@@ -169,8 +172,8 @@ Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name(
 Route::prefix('order-note')->group(function () {
     Route::get('/', [OrderNoteController::class, 'index']);
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/{orderNote}', [OrderNoteController::class, 'getByOrderNoteId']);
         Route::middleware('user')->group(function () {
-            Route::get('/{orderNote}', [OrderNoteController::class, 'getByOrderNoteId']);
         });
         Route::middleware('admin')->group(function () {
             Route::post('/create', [OrderNoteController::class, 'store']);
