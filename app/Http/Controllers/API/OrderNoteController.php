@@ -107,6 +107,37 @@ class OrderNoteController extends Controller
             'data' => $orderNote,
         ]);
     }
+    // update by order note id
+    public function updateByOrderNoteId(OrderNoteRequest $request, $orderNoteId)
+    {
+        $validatedData = $request->validated();
+
+        //$orderNote = $this->orderNoteService->getByOrderNoteId($orderNoteId);
+
+        // if ($orderNote->isEmpty()) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'No order notes found for this order',
+        //     ], 404);
+        // }
+        
+        $orderNote = $this->orderNoteService->updateByOrderNoteId($orderNoteId, [
+            'note' => $validatedData['note'],
+        ]);
+
+        if (!$orderNote) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update order note',
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $orderNote,
+        ]);
+    }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -122,6 +153,26 @@ class OrderNoteController extends Controller
         }
 
         $this->orderNoteService->delete($id);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order note deleted successfully',
+        ]);
+    }
+
+    // delete by order note id
+    public function destroyByOrderNoteId($orderNoteId)
+    {
+        $orderNote = $this->orderNoteService->getByOrderNoteId($orderNoteId);
+
+        if ($orderNote->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No order notes found for this order',
+            ], 404);
+        }
+
+        $this->orderNoteService->deleteByOrderNoteId($orderNoteId);
 
         return response()->json([
             'status' => 'success',

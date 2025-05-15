@@ -177,8 +177,8 @@ Route::prefix('order-note')->group(function () {
         });
         Route::middleware('admin')->group(function () {
             Route::post('/create', [OrderNoteController::class, 'store']);
-            Route::put('/update/{orderNote}', [OrderNoteController::class, 'update']);
-            Route::delete('/delete/{orderNote}', [OrderNoteController::class, 'destroy']);
+            Route::post('/update/{orderNote}', [OrderNoteController::class, 'updateByOrderNoteId']);
+            Route::get('/delete/{orderNote}', [OrderNoteController::class, 'destroyByOrderNoteId']);
         });
     });
 });
