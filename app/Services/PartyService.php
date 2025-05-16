@@ -59,6 +59,17 @@ class PartyService
     }
 
     /**
+     * Get a party by party ID.
+     *
+     * @param string $partyId
+     * @return \App\Models\Party|null
+     */
+    public function updateByPartyId(Party $party, array $data) 
+    {
+        return Party::where('party_id', $party->party_id)->update($data);
+    }
+
+    /**
      * Delete a party.
      *
      * @param \App\Models\Party $party
@@ -66,6 +77,6 @@ class PartyService
      */
     public function deleteParty(Party $party)
     {
-        return $party->delete();
+        return Party::where('party_id', $party->party_id)->delete();
     }
 }

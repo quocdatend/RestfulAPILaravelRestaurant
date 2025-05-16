@@ -49,7 +49,7 @@ class MenuController extends Controller
             'description' => $validated['description'],
             'image' => $imagePath,
             'detail' => $validated['detail'],
-            'status' => $validated['status'],
+            'status' => 1,
             'category_id' => $validated['category_id'],
         ]);
 
@@ -94,6 +94,26 @@ class MenuController extends Controller
         return response()->json([
             'status' => 'success',
             'menus' => $menus
+        ]);
+    }
+
+    /**
+     * Find menu by ID.
+     */
+    public function findById($id)
+    {
+        $menu = $this->menuService->getMenuById($id);
+
+        if (!$menu) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Menu not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'menu' => $menu
         ]);
     }
 

@@ -102,6 +102,15 @@ class OrderController extends Controller
         //
     }
 
+    public function getByOrderId($id)
+    {
+        $order = $this->orderService->getOrderById($id);
+        return response()->json([
+            'status' => 'true',
+            'order' => $order
+        ], 200);
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -174,12 +183,9 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * update status order complete
-     */
-    public function updateStatus($id)
+    public function rejectOrder($orderId)
     {
-        $order = $this->orderService->getOrderById($id);
+        $order = $this->orderService->getOrderByOrderId($orderId);
 
         if (!$order) {
             return response()->json([
@@ -189,41 +195,16 @@ class OrderController extends Controller
         }
 
         $this->orderService->updateOrder($order, [
-            'status' => 1,
+            'status' => -2,
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Order status updated successfully',
+            'message' => 'Order rejected successfully',
             'order' => $order
         ]);
     }
 
-    /**
-     * update status order cancel
-     */
-    public function updateStatusCancel($id)
-    {
-        $order = $this->orderService->getOrderById($id);
-
-        if (!$order) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Order not found'
-            ], 404);
-        }
-
-        $this->orderService->updateOrder($order, [
-            'status' => -1,
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Order status updated successfully',
-            'order' => $order
-        ]);
-    }
-    
     // cancel or by user
     public function cancelOrder($orderId)
     {
@@ -246,6 +227,95 @@ class OrderController extends Controller
             'order' => $order
         ]);
     }
+
+    public function confirmPayment($orderId)
+    {
+        $order = $this->orderService->getOrderByOrderId($orderId);
+
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        $this->orderService->updateOrder($order, [
+            'status' => 2,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Payment confirmed successfully',
+            'order' => $order
+        ]);
+    }
+
+    public function statusCompleted($orderId)
+    {
+        $order = $this->orderService->getOrderByOrderId($orderId);
+
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        $this->orderService->updateOrder($order, [
+            'status' => 3,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order marked as completed successfully',
+            'order' => $order
+        ]);
+    }
+
+    public function confirmOrder($orderId)
+    {
+        $order = $this->orderService->getOrderByOrderId($orderId);
+
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        $this->orderService->updateOrder($order, [
+            'status' => 4,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order confirmed successfully',
+            'order' => $order
+        ]);
+    }
+
+    public function statusConfirmed($orderId)
+    {
+        $order = $this->orderService->getOrderByOrderId($orderId);
+
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        $this->orderService->updateOrder($order, [
+            'status' => 5,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order marked as confirmed successfully',
+            'order' => $order
+        ]);
+    }
+
     /**
      * Remove the specified resource from storage.
      */

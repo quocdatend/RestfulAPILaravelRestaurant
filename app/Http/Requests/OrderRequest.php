@@ -33,7 +33,7 @@ class OrderRequest extends FormRequest
             'order_time' => 'required|date_format:H:i',
             'party_id' => 'required|exists:parties,party_id',
             'phone_number' => 'required|string|max:15',
-            'status' => 'integer|in:-2,-1,0,1,2,3',
+            'status' => 'integer|in:-2,-1,0,1,2,3,4,5',
             // 'order_id' => 'required|exists:orders,id',
             // 'menu_id' => 'required|exists:menus,id',
             // 'quantity' => 'required|integer|min:1',

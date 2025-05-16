@@ -27,7 +27,7 @@ class OrderService
      */
     public function getOrderById(string $id)
     {
-        return Order::find($id);
+        return Order::where('order_id', $id)->first();
     }
     /**
      * Get an order by order ID.

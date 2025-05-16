@@ -56,7 +56,7 @@ Route::prefix('category')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('admin')->group(function () {
             Route::post('/create', [CategoryController::class, 'create']);
-            Route::put('/update/{category}', [CategoryController::class, 'update']);
+            Route::post('/update/{category}', [CategoryController::class, 'update']);
             Route::delete('/delete/{category}', [CategoryController::class, 'destroy']);
         });
     });
@@ -66,6 +66,7 @@ Route::prefix('category')->group(function () {
 Route::prefix('menu')->group(function () {
     Route::get('/', [MenuController::class, 'index']);
     Route::get('/findByCategory/{category}', [MenuController::class, 'findByCategory']);
+    Route::get('/find/{id}', [MenuController::class, 'findById']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('admin')->group(function () {
@@ -78,17 +79,26 @@ Route::prefix('menu')->group(function () {
 
 // order
 Route::prefix('order')->group(function () {
-    Route::get('/', [OrderController::class, 'index']);
-
+    
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/confirmPayment/{orderId}', [OrderController::class, 'confirmPayment']);
+
         Route::middleware('user')->group(function () {
             Route::post('/create', [OrderController::class, 'create']);
+            Route::get('/getByOrderId/{orderId}', [OrderController::class, 'getByOrderId']);
             Route::get('/findByUser', [OrderController::class, 'indexByUser']);
             Route::get('/cancelByUser/{orderId}', [OrderController::class, 'cancelOrder']);
-            Route::put('/update/{order}', [OrderController::class, 'update']);
-            Route::put('/updateStatus/{order}', [OrderController::class, 'updateStatus']);
-            Route::put('/updateStatusCancel/{order}', [OrderController::class, 'updateStatusCancel']);
+            Route::get('/markAsCompleted/{orderId}', [OrderController::class, 'markAsCompleted']);
+            Route::get('/confirmOrder/{orderId}', [OrderController::class, 'confirmOrder']);
+            Route::post('/updatePrice/{orderId}', [OrderController::class, 'updatePrice']);
             Route::delete('/delete/{order}', [OrderController::class, 'destroy']);
+        });
+
+        Route::middleware('admin')->group(function () {
+            Route::get('/', [OrderController::class, 'index']);
+            Route::get('/statusConfirmed/{orderId}', [OrderController::class, 'statusConfirmed']);
+            Route::get('/statusCompleted/{orderId}', [OrderController::class, 'statusCompleted']);
+            Route::get('/rejectOrder/{orderId}', [OrderController::class, 'rejectOrder']);
         });
     });
 });
@@ -96,14 +106,14 @@ Route::prefix('order')->group(function () {
 // order item
 Route::prefix('order-item')->group(function () {
     Route::get('/', [OrderItemController::class, 'index']);
+    Route::get('/findByOrder/{order}', [OrderItemController::class, 'findByOrder']);
 
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('user')->group(function () {
-            Route::get('/findByOrder/{order}', [OrderItemController::class, 'findByOrder']);
             Route::post('/create', [OrderItemController::class, 'create']);
-            Route::put('/update/{orderItem}', [OrderItemController::class, 'update']);
-            Route::delete('/delete/{orderItem}', [OrderItemController::class, 'destroy']);
+            Route::post('/update/{orderItem}', [OrderItemController::class, 'update']);
+            Route::get('/delete/{orderItem}', [OrderItemController::class, 'destroy']);
         });
     });
 });
@@ -139,8 +149,8 @@ Route::prefix('party')->group(function () {
 
         Route::middleware('admin')->group(function () {
             Route::post('/create', [PartyController::class, 'create']);
-            Route::put('/update', [PartyController::class, 'update']);
-            Route::delete('/delete/{id}', [PartyController::class, 'destroy']);
+            Route::post('/updateByPartyId/{id}', [PartyController::class, 'updateByPartyId']);
+            Route::get('/delete/{id}', [PartyController::class, 'destroy']);
         });
     });
 });
@@ -169,13 +179,13 @@ Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name(
 Route::prefix('order-note')->group(function () {
     Route::get('/', [OrderNoteController::class, 'index']);
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/{orderNote}', [OrderNoteController::class, 'getByOrderNoteId']);
         Route::middleware('user')->group(function () {
-            Route::get('/{orderNote}', [OrderNoteController::class, 'getByOrderNoteId']);
         });
         Route::middleware('admin')->group(function () {
             Route::post('/create', [OrderNoteController::class, 'store']);
-            Route::put('/update/{orderNote}', [OrderNoteController::class, 'update']);
-            Route::delete('/delete/{orderNote}', [OrderNoteController::class, 'destroy']);
+            Route::post('/update/{orderNote}', [OrderNoteController::class, 'updateByOrderNoteId']);
+            Route::get('/delete/{orderNote}', [OrderNoteController::class, 'destroyByOrderNoteId']);
         });
     });
 });

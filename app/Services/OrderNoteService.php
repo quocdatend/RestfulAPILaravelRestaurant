@@ -78,6 +78,16 @@ class OrderNoteService
         }
         return false;
     }
+    // update by order note id
+    public function updateByOrderNoteId(string $orderNoteId, array $data): bool
+    {
+        $orderNote = OrderNote::where('order_note_id', $orderNoteId)->first();
+        
+        if ($orderNote) {
+            return $this->orderNote->where('order_note_id', $orderNote->order_note_id)->update($data);
+        }
+        return false;
+    }
     /**
      * Delete an order note.
      *
@@ -89,6 +99,22 @@ class OrderNoteService
         $orderNote = $this->findById($id);
         if ($orderNote) {
             return $orderNote->delete();
+        }
+        return false;
+    }
+
+    /**
+     * Delete order notes by order ID.
+     *
+     * @param string $orderId
+     * @return bool
+     */
+    public function deleteByOrderNoteId(string $orderNoteId): bool
+    {
+        $orderNote = OrderNote::where('order_note_id', $orderNoteId)->first();
+        
+        if ($orderNote) {
+            return OrderNote::where('order_note_id', $orderNote->order_note_id)->delete();
         }
         return false;
     }

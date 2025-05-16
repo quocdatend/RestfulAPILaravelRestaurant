@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->string('id',13)->primary();
             $table->string('order_id',13);
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade');
             $table->string('menu_id',13);
             $table->integer('quantity')->default(1);
             $table->decimal('price', 10, 2);

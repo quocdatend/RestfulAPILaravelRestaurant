@@ -41,10 +41,24 @@
             margin: 6px 0;
             font-size: 15px;
         }
+
+        .link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 20px;
+            text-decoration: none;
+            border: 1px solid #000;
+            border-radius: 14px;
+            color: #000;
+            transition: background-color 0.3s;
+        }
+
+        .link:hover {
+            background-color: #eee;
+        }
     </style>
 </head>
 <body>
-
 
 <div class="card">
     <div class="status-icon status-success">✅</div>
@@ -56,7 +70,29 @@
         <p><strong>Ngân hàng:</strong> {{ $data['vnp_BankCode'] }}</p>
         <p><strong>Thời gian:</strong> {{ \Carbon\Carbon::createFromFormat('YmdHis', $data['vnp_PayDate'])->format('d/m/Y H:i:s') }}</p>
     </div>
+
+    <a href="http://localhost:5173/dashboard/orders" class="link">
+        &laquo; Quay lại
+    </a>
 </div>
+
+<script>
+    // Gửi xác nhận thanh toán đến API Laravel
+    fetch(`http://127.0.0.1:8000/api/order/confirmPayment{{ $data['vnp_TxnRef'] }}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token'), // nếu cần token
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Đã xác nhận thanh toán:', data);
+    })
+    .catch(error => {
+        console.error('Lỗi khi xác nhận thanh toán:', error);
+    });
+</script>
 
 </body>
 </html>

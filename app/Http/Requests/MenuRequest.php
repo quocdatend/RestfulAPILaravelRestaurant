@@ -29,7 +29,6 @@ class MenuRequest extends FormRequest
             'price' => 'required|decimal:0,2',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'detail' => 'nullable|string|max:1000',
-            'status' => 'required|integer|in:0,1',
             'category_id' => 'required|exists:categories,id',
         ];
     }
