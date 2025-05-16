@@ -24,9 +24,11 @@ class OrderItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => 'required|exists:orders,id',
+            'order_id' => 'required|exists:orders,order_id',
             'menu_id' => 'required|exists:menus,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
+            'price' => 'required|decimal:0,2|min:0',
+            'total_price' => 'required|decimal:0,2|min:0',
         ];
     }
 

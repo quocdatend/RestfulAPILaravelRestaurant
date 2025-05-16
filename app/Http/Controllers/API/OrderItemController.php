@@ -38,12 +38,13 @@ class OrderItemController extends Controller
     {
         $validated = $request->validated();
 
-        $orderItem = OrderItem::create([
-            'id' => uniqid(),
+        $orderItem = $this->orderItemService->createOrderItem([
+            'id' => str_pad(mt_rand(0, 9999999999999), 13, '0', STR_PAD_RIGHT),
             'order_id' => $validated['order_id'],
             'menu_id' => $validated['menu_id'],
             'quantity' => $validated['quantity'],
-            'status' => 0,
+            'price' => $validated['price'],
+            'total_price' => $validated['total_price']
         ]);
 
         return response()->json([
@@ -70,8 +71,8 @@ class OrderItemController extends Controller
         if ($orderItems->isEmpty()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No order items found for this order ID'
-            ], 404);
+                'order_items' => $orderItems
+            ], 200);
         }
         return response()->json([
             'status' => 'success',
@@ -113,6 +114,8 @@ class OrderItemController extends Controller
             'order_id' => $validated['order_id'],
             'menu_id' => $validated['menu_id'],
             'quantity' => $validated['quantity'],
+            'price' => $validated['price'],
+            'total_price' => $validated['total_price']
         ]);
 
         return response()->json([
