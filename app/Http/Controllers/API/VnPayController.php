@@ -32,7 +32,7 @@ class VnpayController extends Controller
         // Dưới đây là thông tin giả định, bạn có thể lấy thông tin đơn hàng của bạn  để thay thế
         $order = (object)[
             "code" => $validated['order_id'],  // Mã đơn hàng
-            "total" => $validated['total_price'] * 100, // Số tiền cần thanh toán (VND)
+            "total" => $validated['total_price'], // Số tiền cần thanh toán (VND)
             "bankCode" => 'NCB',   // Mã ngân hàng
             "type" => "billpayment", // Loại đơn hàng
             "info" => "Thanh toán đơn hàng" // Thông tin đơn hàng
@@ -42,10 +42,10 @@ class VnpayController extends Controller
         $vnp_TxnRef = $order->code . $request->user()->id;
         $vnp_OrderInfo = $order->info;
         $vnp_OrderType =  $order->type;
-        $vnp_Amount = $order->total * 1000;
+        $vnp_Amount = $order->total * 100;
         $vnp_Locale = 'vn';
         $vnp_BankCode = $order->bankCode;  // Mã ngân hàng
-        $vnp_IpAddr = $validated['ip']; // Địa chỉ IP
+        $vnp_IpAddr = $request->ip(); // Địa chỉ IP
 
         // Tạo input data để gửi sang VNPay server
         $inputData = array(

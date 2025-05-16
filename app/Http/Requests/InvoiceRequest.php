@@ -24,7 +24,8 @@ class InvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => 'required|string|exists:orders,id',
+            'order_id' => 'required|string|exists:orders,order_id',
+            'total_price' => 'required|decimal:0,2'
         ];
     }
 
