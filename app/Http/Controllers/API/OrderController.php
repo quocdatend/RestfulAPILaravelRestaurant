@@ -7,6 +7,7 @@ use App\Http\Requests\OrderRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Services\OrderService;
 use App\Services\OrderItemService;
 
@@ -14,11 +15,13 @@ class OrderController extends Controller
 {
     protected $orderService;
     protected $orderItemService;
+    protected $userService;
 
-    public function __construct(OrderService $orderService, OrderItemService $orderItemService)
+    public function __construct(OrderService $orderService, OrderItemService $orderItemService, UserService $userService)
     {
         $this->orderService = $orderService;
         $this->orderItemService = $orderItemService;
+        $this->userService = $userService;
     }
 
     /**
@@ -46,12 +49,6 @@ class OrderController extends Controller
     {
         $userId = $request->user()->id;
         $orders = $this->orderService->getOrdersByUserId($userId);
-        if ($orders->isEmpty()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'No orders found for this user'
-            ], 404);
-        }
         return response()->json([
             'status' => 'success',
             'orders' => $orders
@@ -228,9 +225,18 @@ class OrderController extends Controller
         ]);
     }
 
-    public function confirmPayment($orderId)
+    public function confirmPayment($orderId, $userId)
     {
         $order = $this->orderService->getOrderByOrderId($orderId);
+
+        $user = $this->userService->getUserById($userId);
+        
+        if(!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not found'
+            ], 404);
+        }
 
         if (!$order) {
             return response()->json([

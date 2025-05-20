@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use App\Services\CategoryService;
+use App\Http\Resources\CategoryResource;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
@@ -32,10 +33,11 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = $this->categoryService->getAllCategories();
-        return response()->json([
-            'status' => 'success',
-            'categories' => $categories
-        ]);
+        return CategoryResource::collection($categories);
+        // return response()->json([
+        //     'status' => 'success',
+        //     'categories' => $categories
+        // ]);
     }
 
     /**

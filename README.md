@@ -73,3 +73,23 @@ Authorization Bearer {token}
     "image":""
 }
 ```
+### update
+```
+POST : http://127.0.0.1:8000/api/menu/update/{menuId}
+Authorization Bearer {token}
+{
+    "_method":"PUT",
+    "name":"",
+    "image":""
+}
+```
+### delete
+```
+DELETE : http://127.0.0.1:8000/api/menu/delete/{menuId}
+Authorization Bearer {token}
+```
+## Order
+### create
+```
+
+```

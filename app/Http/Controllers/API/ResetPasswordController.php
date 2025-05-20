@@ -63,7 +63,7 @@ class ResetPasswordController extends Controller
             return view('auth.reset-fail');
         }
         $user = User::where('email', $passwordReset->email)->firstOrFail();
-        // $updatePasswordUser = $user->update($request->only('password'));
+        $user->update($request->only('password'));
         $passwordReset->delete();
 
         return view('auth.reset-success');
