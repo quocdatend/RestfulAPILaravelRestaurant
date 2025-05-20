@@ -71,7 +71,7 @@ Route::prefix('menu')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('admin')->group(function () {
             Route::post('/create', [MenuController::class, 'create']);
-            Route::put('/update/{menu}', [MenuController::class, 'update']);
+            Route::post('/update/{menu}', [MenuController::class, 'update']);
             Route::delete('/delete/{menu}', [MenuController::class, 'destroy']);
         });
     });
@@ -79,9 +79,9 @@ Route::prefix('menu')->group(function () {
 
 // order
 Route::prefix('order')->group(function () {
+    Route::get('/confirmPayment/{orderId}/{userId}', [OrderController::class, 'confirmPayment']);
     
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/confirmPayment/{orderId}', [OrderController::class, 'confirmPayment']);
 
         Route::middleware('user')->group(function () {
             Route::post('/create', [OrderController::class, 'create']);

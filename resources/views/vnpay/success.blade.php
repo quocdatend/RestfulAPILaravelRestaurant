@@ -77,13 +77,14 @@
 </div>
 
 <script>
-    // Gửi xác nhận thanh toán đến API Laravel
-    fetch(`http://127.0.0.1:8000/api/order/confirmPayment{{ $data['vnp_TxnRef'] }}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token'), // nếu cần token
-            'Accept': 'application/json'
-        }
+    $txnRef = $data['vnp_TxnRef'];
+    $length = strlen($txnRef);
+    $half = intdiv($length, 2);
+    $part1 = substr($txnRef, 0, $half);
+    $part2 = substr($txnRef, $half);
+
+    fetch(`http://127.0.0.1:8000/api/order/confirmPayment/{{ $part1  }}/{{ $part2 }}`, {
+        method: 'GET'
     })
     .then(response => response.json())
     .then(data => {
